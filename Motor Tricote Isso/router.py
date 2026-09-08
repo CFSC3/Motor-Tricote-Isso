@@ -1,10 +1,11 @@
+import os
 from fastapi import APIRouter, UploadFile, Form, File
 from ia_service import AnalisadorTextilIA
 
 router = APIRouter()
 
-# Injeção da chave diretamente no construtor do serviço
-CHAVE_API = "AQ.Ab8RN6Ih9iFVlJEpLyQDOpjHujaJV0TbTVT2EIaS6s5uKUq6Yw"
+# O sistema agora busca a chave de forma oculta nas variáveis do Render
+CHAVE_API = os.getenv("GEMINI_API_KEY")
 servico_ia = AnalisadorTextilIA(api_key=CHAVE_API)
 
 @router.post("/analisar_peca")
