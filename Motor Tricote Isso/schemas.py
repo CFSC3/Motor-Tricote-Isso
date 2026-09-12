@@ -10,4 +10,5 @@ class FichaTecnica(BaseModel):
     fios_necessarios: List[FioCor]
     total_novelos_peca: int
     tamanho_agulha_recomendado: str
+    tex_recomendado: str  
     diretriz_inicial: str

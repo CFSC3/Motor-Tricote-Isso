@@ -4,7 +4,6 @@ from ia_service import AnalisadorTextilIA
 
 router = APIRouter()
 
-# O sistema agora busca a chave de forma oculta nas variáveis do Render
 CHAVE_API = os.getenv("GEMINI_API_KEY")
 servico_ia = AnalisadorTextilIA(api_key=CHAVE_API)
 
@@ -12,6 +11,8 @@ servico_ia = AnalisadorTextilIA(api_key=CHAVE_API)
 async def processar_peca(
     categoria: str = Form(...),
     tamanho_alvo: str = Form(...),
+    mao_dominante: str = Form(...),  
+    tensao_ponto: str = Form(...),   
     imagem: UploadFile = File(...)
 ):
     image_data = await imagem.read()
@@ -19,6 +20,8 @@ async def processar_peca(
         image_data=image_data,
         mime_type=imagem.content_type,
         categoria=categoria,
-        tamanho_alvo=tamanho_alvo
+        tamanho_alvo=tamanho_alvo,
+        mao_dominante=mao_dominante, 
+        tensao_ponto=tensao_ponto    
     )
     return resultado
