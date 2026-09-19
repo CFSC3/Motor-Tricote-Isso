@@ -43,5 +43,18 @@ Certifique-se de ter o Python 3.9+ instalado. É recomendável o uso de um ambie
 
 ### **2. Variáveis de Ambiente**
 Configure a sua chave de API para o serviço Gemini:
-```bash
-export GEMINI_API_KEY="SUA_CHAVE_AQUI"
+ 
+`export GEMINI_API_KEY="SUA_CHAVE_AQUI"`
+
+### **3. Instalação e Execução**
+Instale as dependências e inicie o servidor utilizando o Uvicorn:
+
+`pip install -r requirements.txt`
+`uvicorn main:app --reload`
+
+O servidor estará disponível em `http://localhost:8000`. Você pode acessar a documentação interativa da API em `/docs`.
+
+---
+
+**Responsável pelo Projeto:** Carlos Felipe 
+**Data da última atualização:** 19/09/2026
