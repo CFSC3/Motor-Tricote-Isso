@@ -4,6 +4,8 @@ O **Motor Tricote Isso** é uma ferramenta inteligente desenvolvida especificame
 
 O backend é construído sobre o framework FastAPI para processamento eficiente de imagens. O roadmap futuro do projeto inclui funcionalidades de precificação automática e visualização de peças em 3D.
 
+O **Motor Tricote Isso** foi desenvolvido especificamente para ser integrado ao aplicativo mobile Tricote Isso sendo o responsável pela regra de negócio do sistema. 
+
 ## **Estrutura do Projeto**
 
 A arquitetura do sistema está organizada para garantir escalabilidade e clareza na separação de responsabilidades. Abaixo estão descritos os principais arquivos:
