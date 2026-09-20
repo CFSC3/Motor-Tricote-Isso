@@ -1,11 +1,13 @@
 import os
 from fastapi import APIRouter, UploadFile, Form, File
 from ia_service import AnalisadorTextilIA
+from ia_image_service import GeradorImagensIA
 
 router = APIRouter()
 
 CHAVE_API = os.getenv("GEMINI_API_KEY")
 servico_ia = AnalisadorTextilIA(api_key=CHAVE_API)
+servico_imagem_ia = GeradorImagensIA(api_key=CHAVE_API)
 
 @router.post("/analisar_peca")
 async def processar_peca(
@@ -24,4 +26,24 @@ async def processar_peca(
         mao_dominante=mao_dominante, 
         tensao_ponto=tensao_ponto    
     )
+    return resultado
+
+# ROTA DA VERSÃO 2 
+@router.post("/gerar_projeto_visual")
+async def criar_imagens_referencia(
+    categoria: str = Form(...),       
+    tex_recomendado: str = Form(...),
+    tensao_ponto: str = Form(...), 
+    imagem: UploadFile = File(...)
+):
+    image_data = await imagem.read()
+    
+    resultado = await servico_imagem_ia.gerar_turnaround_amigurumi(
+        image_data=image_data,
+        mime_type=imagem.content_type,
+        categoria=categoria,         
+        tex_recomendado=tex_recomendado,
+        tensao_ponto=tensao_ponto 
+    )
+    
     return resultado

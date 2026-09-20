@@ -12,3 +12,8 @@ class FichaTecnica(BaseModel):
     tamanho_agulha_recomendado: str
     tex_recomendado: str  
     diretriz_inicial: str
+
+class ProjetoVisualResponse(BaseModel):
+    sucesso: bool
+    imagem_multi_angulo_base64: str
+    descricao_interpretada: str
