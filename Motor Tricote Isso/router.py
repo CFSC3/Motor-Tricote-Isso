@@ -34,6 +34,7 @@ async def criar_imagens_referencia(
     categoria: str = Form(...),       
     tex_recomendado: str = Form(...),
     tensao_ponto: str = Form(...), 
+    cores_identificadas: str = Form(...), 
     imagem: UploadFile = File(...)
 ):
     image_data = await imagem.read()
@@ -43,7 +44,8 @@ async def criar_imagens_referencia(
         mime_type=imagem.content_type,
         categoria=categoria,         
         tex_recomendado=tex_recomendado,
-        tensao_ponto=tensao_ponto 
+        tensao_ponto=tensao_ponto,
+        cores_identificadas=cores_identificadas 
     )
     
     return resultado

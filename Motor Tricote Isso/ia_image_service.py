@@ -9,13 +9,13 @@ class GeradorImagensIA:
         self.modelo_visao = 'gemini-3.6-flash'
         self.modelo_gerador = 'imagen-3.0-generate-002'
 
-    async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str) -> dict:
+    async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:
         tentativas_maximas = 3
         
         for tentativa in range(tentativas_maximas):
             try:
                 categoria_limpa = categoria.strip()
-                escolhas_adversas = categoria_limpa in ["Roupas (Vestuário)", "Bebê e Infantil", "Pets", "Acessórios","Casa e Decoração"]
+                escolhas_adversas = categoria_limpa in ["Roupas (Vestuário)", "Bebê e Infantil", "Pets", "Acessórios", "Casa e Decoração"]
 
                 # ==========================================
                 # ENGENHARIA REVERSA (Extração da Identidade)
@@ -24,14 +24,15 @@ class GeradorImagensIA:
                     prompt_extracao = """
                     Você é um diretor de arte focado em moda artesanal. Analise a imagem enviada.
                     Concentre-se APENAS na peça de roupa ou acessório de tricô/crochê presente na imagem. 
-                    Ignore completamente a pessoa, bebê, animal que está vestindo a peça ou quaisquer outros elementos ao redor.
-                    Extraia o design estrutural: tipo de gola, mangas, caimento, texturas, padrões visíveis e cores.
+                    REGRA DE ISOLAMENTO: Ignore completamente fundos, cenários, a pessoa/animal vestindo a peça e quaisquer adereços externos.
+                    Extraia o design estrutural: tipo de gola, mangas, caimento, texturas e padrões visíveis.
                     Retorne APENAS a descrição física crua e detalhada da PEÇA em inglês.
                     """
                 else:
                     prompt_extracao = """
                     Você é um diretor de arte. Analise a imagem enviada (pode ser um animal real, um personagem de filme 2D/3D ou um rascunho).
-                    Extraia a identidade visual primária: cores exatas, formato dos olhos, detalhes marcantes e proporções corporais.
+                    REGRA DE ISOLAMENTO: Ignore completamente fundos, cenários (como ilhas, árvores), adereços externos e símbolos flutuantes. 
+                    Extraia a identidade visual primária EXCLUSIVA DO PERSONAGEM PRINCIPAL: formato dos olhos, detalhes marcantes e proporções corporais.
                     Retorne APENAS a descrição física crua e detalhada em inglês. Não mencione o estilo original da foto.
                     """
                 
@@ -46,7 +47,7 @@ class GeradorImagensIA:
                 descricao_extraida = response_visao.text.strip()
 
                 # ==========================================
-                # FÍSICA DO MATERIAL: Cruzando Tex + Tensão
+                # FÍSICA DO MATERIAL: Cruzando Tex + Tensão + Cores
                 # ==========================================
                 aperto_ponto = "tight, flawless stitches" 
                 if "apertada" in tensao_ponto.lower():
@@ -58,7 +59,13 @@ class GeradorImagensIA:
                 if "alto" in tex_recomendado.lower() or "grosso" in tex_recomendado.lower() or "pelúcia" in tex_recomendado.lower():
                     espessura_fio = "chunky thick chenille yarn, fluffy and expansive texture"
 
-                textura_final = f"Made of {espessura_fio}, crocheted/knitted with {aperto_ponto}."
+                # REGRA 100% FIO E INJEÇÃO DE CORES
+                textura_final = f"""
+                Material: {espessura_fio}, crocheted/knitted with {aperto_ponto}.
+                Mandatory Colors: Use STRICTLY these yarn colors: {cores_identificadas}.
+                STRICT RULE: EVERYTHING in this design (including clothes, hair, body, and accessories) MUST be made of physical yarn/crochet. 
+                NO real fabric, NO plastic, NO leather, NO smooth textures allowed. The ONLY exception is shiny acrylic safety eyes.
+                """
 
                 # ==========================================
                 # RENDERIZAÇÃO DO PROJETO MULTI-ÂNGULO
@@ -101,12 +108,10 @@ class GeradorImagensIA:
                 }
 
             except Exception as erro:
-                # Se for a última tentativa, retorna o erro final
                 if tentativa == tentativas_maximas - 1:
                     return {
                         "sucesso": False,
                         "imagem_multi_angulo_base64": "",
                         "descricao_interpretada": f"Falha após {tentativas_maximas} tentativas. Detalhe: {str(erro)}"
                     }
-                # Se não for a última, o sistema "dorme" por alguns segundos antes de tentar de novo
                 await asyncio.sleep(5 * (tentativa + 1))
