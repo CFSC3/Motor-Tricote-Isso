@@ -10,7 +10,7 @@ class GeradorImagensIA:
         self.modelo_gerador = 'imagen-3.0-generate-002'
 
     async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:
-        tentativas_maximas = 3
+        tentativas_maximas = 6
         
         for tentativa in range(tentativas_maximas):
             try:
@@ -114,4 +114,4 @@ class GeradorImagensIA:
                         "imagem_multi_angulo_base64": "",
                         "descricao_interpretada": f"Falha após {tentativas_maximas} tentativas. Detalhe: {str(erro)}"
                     }
-                await asyncio.sleep(5 * (tentativa + 1))
+                await asyncio.sleep(4 * (tentativa + 1))
