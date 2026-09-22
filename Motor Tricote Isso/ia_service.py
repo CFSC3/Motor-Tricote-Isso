@@ -19,7 +19,7 @@ class AnalisadorTextilIA:
         )
         
                 # Identificador completo compatível com o Vertex AI na SDK nova
-        self.modelo_visao = 'gemini-3.5-flash'
+        self.modelo = 'gemini-3.5-flash'
 
 
     async def analisar_imagem(self, image_data: bytes, mime_type: str, categoria: str, tamanho_alvo: str, mao_dominante: str, tensao_ponto: str) -> dict:
