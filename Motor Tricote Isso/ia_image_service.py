@@ -18,8 +18,7 @@ class GeradorImagensIA:
         )
         
                 # Identificador completo compatível com o Vertex AI na SDK nova
-        self.modelo = 'publishers/google/models/gemini-3.8-flash'
- 
+        sself.modelo_visao = 'gemini-3.8-flash'
         self.modelo_gerador = 'imagen-3.0-generate-002'
 
     async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:
