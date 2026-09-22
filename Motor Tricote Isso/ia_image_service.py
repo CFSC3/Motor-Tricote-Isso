@@ -18,7 +18,7 @@ class GeradorImagensIA:
         )
         
         # Nomes oficiais dos modelos no Vertex AI
-        self.modelo_visao = 'gemini-1.5-flash-002' 
+        self.modelo = 'gemini-1.5-flash' 
         self.modelo_gerador = 'imagen-3.0-generate-002'
 
     async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:

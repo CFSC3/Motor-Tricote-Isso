@@ -19,7 +19,7 @@ class AnalisadorTextilIA:
         )
         
         # Atualiza para a nomenclatura oficial do modelo no Vertex
-        self.modelo = 'gemini-1.5-flash-002'
+        self.modelo = 'gemini-1.5-flash'
 
     async def analisar_imagem(self, image_data: bytes, mime_type: str, categoria: str, tamanho_alvo: str, mao_dominante: str, tensao_ponto: str) -> dict:
 
