@@ -5,9 +5,9 @@ from ia_image_service import GeradorImagensIA
 
 router = APIRouter()
 
-CHAVE_API = os.getenv("GEMINI_API_KEY")
-servico_ia = AnalisadorTextilIA(api_key=CHAVE_API)
-servico_imagem_ia = GeradorImagensIA(api_key=CHAVE_API)
+# Instanciando os serviços limpos (eles já leem o arquivo JSON por conta própria)
+servico_ia = AnalisadorTextilIA()
+servico_imagem_ia = GeradorImagensIA()
 
 @router.post("/analisar_peca")
 async def processar_peca(

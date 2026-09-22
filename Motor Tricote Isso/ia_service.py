@@ -1,13 +1,25 @@
-import asyncio
+import os
 import json
+import asyncio
 from google import genai
 from google.genai import types
 from schemas import FichaTecnica
 
 class AnalisadorTextilIA:
-    def __init__(self, api_key: str):
-        self.client = genai.Client(api_key=api_key)
-        self.modelo = 'gemini-3.6-flash'
+    def __init__(self, api_key: str = ""):
+        # Aponta para o arquivo JSON de credenciais
+        caminho_credenciais = os.path.join(os.path.dirname(__file__), 'tricoteIssoVertex.json')
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = caminho_credenciais
+
+        # Inicializa o cliente no modo Enterprise (Vertex AI)
+        self.client = genai.Client(
+            vertexai=True,
+            project="loveyou-21e3d",
+            location="us-central1"
+        )
+        
+        # Atualiza para a nomenclatura oficial do modelo no Vertex
+        self.modelo = 'gemini-1.5-flash-002'
 
     async def analisar_imagem(self, image_data: bytes, mime_type: str, categoria: str, tamanho_alvo: str, mao_dominante: str, tensao_ponto: str) -> dict:
 

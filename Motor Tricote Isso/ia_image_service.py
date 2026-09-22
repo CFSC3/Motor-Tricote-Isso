@@ -1,12 +1,24 @@
+import os
 import asyncio
 import base64
 from google import genai
 from google.genai import types
 
 class GeradorImagensIA:
-    def __init__(self, api_key: str):
-        self.client = genai.Client(api_key=api_key)
-        self.modelo_visao = 'gemini-3.6-flash'
+    def __init__(self, api_key: str = ""):
+        # Aponta para o arquivo JSON de credenciais
+        caminho_credenciais = os.path.join(os.path.dirname(__file__), 'tricoteIssoVertex.json')
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = caminho_credenciais
+
+        # Inicializa o cliente no modo Enterprise (Vertex AI) apontando para o projeto do Firebase
+        self.client = genai.Client(
+            vertexai=True,
+            project="loveyou-21e3d", 
+            location="us-central1"   
+        )
+        
+        # Nomes oficiais dos modelos no Vertex AI
+        self.modelo_visao = 'gemini-1.5-flash-002' 
         self.modelo_gerador = 'imagen-3.0-generate-002'
 
     async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:
