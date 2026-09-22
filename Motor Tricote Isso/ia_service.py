@@ -18,8 +18,9 @@ class AnalisadorTextilIA:
             location="us-central1"
         )
         
-        # Atualiza para a nomenclatura oficial do modelo no Vertex
-        self.modelo = 'gemini-1.5-flash'
+                # Identificador completo compatível com o Vertex AI na SDK nova
+        self.modelo = 'publishers/google/models/gemini-3.8-flash'
+
 
     async def analisar_imagem(self, image_data: bytes, mime_type: str, categoria: str, tamanho_alvo: str, mao_dominante: str, tensao_ponto: str) -> dict:
 
