@@ -1,60 +1,69 @@
 # **Motor Tricote Isso**
 
-O **Motor Tricote Isso** é uma ferramenta inteligente desenvolvida especificamente para artesãos de crochê e tricô. O núcleo deste projeto é um motor de Inteligência Artificial capaz de analisar fotografias de peças artesanais para fornecer estimativas precisas de consumo de fios, recomendações de agulhas e diretrizes técnicas personalizadas, visando a redução do desperdício de materiais no processo criativo.
+O **Motor Tricote Isso** é a inteligência artificial de backend desenvolvida especificamente para dar suporte ao aplicativo mobile **Tricote Isso**, voltado para artesãos de crochê e tricô. O motor processa fotografias de peças artesanais para fornecer estimativas precisas de consumo de fios, recomendações de agulhas, diretrizes técnicas personalizadas e a renderização gráfica de *turnarounds* em múltiplos ângulos (amigurumis e vestuário).
 
-O backend é construído sobre o framework FastAPI para processamento eficiente de imagens. O roadmap futuro do projeto inclui funcionalidades de precificação automática e visualização de peças em 3D.
+O sistema é construído sobre o framework FastAPI e opera em ambiente de produção corporativa na nuvem, utilizando a infraestrutura avançada do Google Cloud (Vertex AI).
 
-O **Motor Tricote Isso** foi desenvolvido especificamente para ser integrado ao aplicativo mobile Tricote Isso sendo o responsável pela regra de negócio do sistema. 
+---
 
 ## **Estrutura do Projeto**
 
-A arquitetura do sistema está organizada para garantir escalabilidade e clareza na separação de responsabilidades. Abaixo estão descritos os principais arquivos:
+A arquitetura do sistema está organizada para garantir alta performance, segurança de credenciais e separação clara de responsabilidades:
 
 | **Arquivo** | **Descrição** |
 | :--- | :--- |
 | `main.py` | Ponto de entrada que inicializa a aplicação FastAPI e configura as rotas básicas. |
-| `router.py` | Gerencia o endpoint `/analisar_peca`, processando uploads de imagens e dados de formulário (categoria, tamanho, mão dominante e tensão do ponto). |
-| `ia_service.py` | Implementa a classe `AnalisadorTextilIA`. Utiliza a Gemini API (`gemini-3.6-flash`) para análise visual e geração da `FichaTecnica`. Contém prompts otimizados para categorias como Roupas, Bebê, Pets e Geral. |
-| `schemas.py` | Define a estrutura de dados via Pydantic, incluindo os modelos `FioCor` e `FichaTecnica` para garantir saídas JSON validadas. |
+| `router.py` | Gerencia os endpoints de processamento, recebendo uploads de imagens e dados de formulário (categoria, tamanho, mão dominante e tensão do ponto). |
+| `ia_service.py` | Implementa a classe `AnalisadorTextilIA`. Utiliza o modelo `gemini-1.5-flash-002` via Vertex AI para análise visual e estruturação da ficha técnica têxtil. |
+| `ia_image_service.py` | Implementa a classe `GeradorImagensIA`. Utiliza o modelo de ponta `imagen-3.0-generate-002` para renderizar folhas de referência em múltiplos ângulos (3 views). |
+| `schemas.py` | Define a estrutura de dados via Pydantic, garantindo validação rigorosa de esquemas JSON. |
+
+---
 
 ## **Tecnologias Utilizadas**
 
-Para garantir a robustez e a modernidade da solução, foram utilizadas as seguintes tecnologias:
-
 - **FastAPI**: Framework moderno de alta performance para a construção de APIs em Python.
-- **Google GenAI SDK (Gemini API)**: Motor de inteligência artificial multimodal para análise de imagens e raciocínio técnico têxtil.
-- **Pydantic**: Biblioteca para validação de dados e gerenciamento de configurações por meio de modelos de dados Python.
+- **Google Cloud Vertex AI & Google GenAI SDK**: Plataforma corporativa de IA para processamento multimodal e geração gráfica.
+  - `gemini-1.5-flash-002`: Análise visual rápida e extração de dados têxteis.
+  - `imagen-3.0-generate-002`: Geração de imagens fotorrealistas de alta fidelidade para amigurumis e peças de vestuário.
+- **Render (Cloud Hosting)**: Hospedagem web com suporte a injeção segura de arquivos de configuração via *Secret Files*.
+- **Pydantic**: Biblioteca para validação e tipagem de dados.
+
+---
 
 ## **Funcionalidades**
 
-O sistema oferece um conjunto de recursos focados na otimização do trabalho artesanal:
+- **Análise Têxtil Inteligente**: Identificação automática de padrões, cores e complexidade de pontos a partir de fotos.
+- **Cálculo Preciso de Metragem**: Estimativa de novelos necessários considerando margem de segurança e ajustes por tensão de ponto.
+- **Diretrizes Personalizadas**: Recomendações adaptadas ao perfil do artesão (como orientações específicas para usuários canhotos).
+- **Geração Gráfica de Turnaround**: Criação automática de vistas ortográficas (frente, perfil e costas) de bonecos e peças de vestuário em manequim invisível.
 
-- **Análise de Imagem por IA**: Identificação automática de padrões de pontos e complexidade da peça através de fotos.
-- **Cálculo de Metragem e Novelos**: Estimativa detalhada da quantidade de fio necessária, incluindo uma margem de segurança de 15% para evitar faltas durante a produção.
-- **Sugestão Técnica**: Recomendação de valores de Tex (densidade do fio) e numeração ideal de agulhas com base na peça analisada.
-- **Orientações Personalizadas**: Geração de diretrizes específicas que consideram o perfil do artesão, como adaptações para usuários canhotos e ajustes baseados na tensão do ponto.
+---
 
 ## **Configuração e Execução**
 
-Para configurar o ambiente de desenvolvimento e executar o servidor localmente, siga os passos abaixo:
-
 ### **1. Requisitos de Ambiente**
-Certifique-se de ter o Python 3.9+ instalado. É recomendável o uso de um ambiente virtual (`venv`).
+- Python 3.9+
+- Conta no Google Cloud configurada com o Vertex AI ativado no projeto do Firebase (`loveyou-21e3d`).
 
-### **2. Variáveis de Ambiente**
-Configure a sua chave de API para o serviço Gemini:
- 
-`export GEMINI_API_KEY="SUA_CHAVE_AQUI"`
+### **2. Autenticação e Segurança (Produção / Render)**
+Em vez de expor chaves de API em texto plano, o motor utiliza o arquivo de credenciais da Conta de Serviço (`tricoteIssoVertex.json`).
+- No ambiente de produção (Render), o arquivo é injetado diretamente na raiz do servidor através da ferramenta de **Secret Files**.
+- A variável de ambiente `GOOGLE_APPLICATION_CREDENTIALS` aponta automaticamente para o caminho do arquivo seguro.
 
-### **3. Instalação e Execução**
-Instale as dependências e inicie o servidor utilizando o Uvicorn:
+### **3. Instalação Local e Execução**
+Para rodar o ambiente de desenvolvimento localmente:
 
-`pip install -r requirements.txt`
-`uvicorn main:app --reload`
+     # Instale as dependências
+     pip install -r requirements.txt
+    
+    # Inicie o servidor local via Uvicorn
+    uvicorn main:app --reload
 
 O servidor estará disponível em `http://localhost:8000`. Você pode acessar a documentação interativa da API em `/docs`.
 
 ---
 
 **Responsável pelo Projeto:** Carlos Felipe 
-**Data da última atualização:** 19/09/2026
+
+**Data da última atualização:** 22/09/2026
