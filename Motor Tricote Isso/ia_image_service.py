@@ -4,30 +4,35 @@ import base64
 from google import genai
 from google.genai import types
 
-
 class GeradorImagensIA:
     def __init__(self, api_key: str = ""):
         # Aponta para o arquivo JSON de credenciais
         caminho_credenciais = os.path.join(os.path.dirname(__file__), 'tricoteIssoVertex.json')
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = caminho_credenciais
 
-        # Inicializa o cliente no modo Enterprise apontando para o projeto do Firebase
-        self.client = genai.Client(
+        # Cliente para o Gemini (Visão) - Funciona na localização global
+        self.client_visao = genai.Client(
             enterprise=True,
             project="loveyou-21e3d", 
             location="global"   
         )
         
-        # Identificador completo compatível com o Vertex AI na SDK nova
+        # Cliente exclusivo para o Imagen - Exige a região us-central1
+        self.client_gerador = genai.Client(
+            enterprise=True,
+            project="loveyou-21e3d", 
+            location="us-central1"   
+        )
+        
         self.modelo_visao = 'gemini-3.8-flash'
-        self.modelo_gerador = 'imagen-3.0-generate-002'
+        self.modelo_gerador = 'imagen-3.0-generate-001'
 
     async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:
         categoria_limpa = categoria.strip()
         escolhas_adversas = categoria_limpa in ["Roupas (Vestuário)", "Bebê e Infantil", "Pets", "Acessórios", "Casa e Decoração"]
 
         # ==========================================
-        # PASSO 1: EXTRAÇÃO
+        # PASSO 1: EXTRAÇÃO (Usa client_visao)
         # ==========================================
         if escolhas_adversas:
             prompt_extracao = """
@@ -50,7 +55,7 @@ class GeradorImagensIA:
         
         for tentativa in range(tentativas_visao):
             try:
-                response_visao = await self.client.aio.models.generate_content(
+                response_visao = await self.client_visao.aio.models.generate_content(
                     model=self.modelo_visao,
                     contents=[
                         types.Part.from_bytes(data=image_data, mime_type=mime_type),
@@ -59,7 +64,7 @@ class GeradorImagensIA:
                     config=types.GenerateContentConfig(temperature=0.2)
                 )
                 descricao_extraida = response_visao.text.strip()
-                break  # CLEAN CODE: Se a leitura der certo, interrompe o laço imediatamente para não gastar cota
+                break
                 
             except Exception as e:
                 if tentativa == tentativas_visao - 1:
@@ -109,12 +114,12 @@ class GeradorImagensIA:
             """
 
         # ==========================================
-        # PASSO 2: RENDERIZAÇÃO
+        # PASSO 2: RENDERIZAÇÃO (Usa client_gerador)
         # ==========================================
         tentativas_imagem = 6
         for tentativa in range(tentativas_imagem):
             try:
-                resultado_imagem = await self.client.aio.models.generate_images(
+                resultado_imagem = await self.client_gerador.aio.models.generate_images(
                     model=self.modelo_gerador,
                     prompt=prompt_imagem,
                     config=types.GenerateImagesConfig(
