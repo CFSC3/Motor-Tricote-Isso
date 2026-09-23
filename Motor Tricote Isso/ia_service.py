@@ -11,16 +11,15 @@ class AnalisadorTextilIA:
         caminho_credenciais = os.path.join(os.path.dirname(__file__), 'tricoteIssoVertex.json')
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = caminho_credenciais
 
-        # Inicializa o cliente no modo Enterprise (Vertex AI)
+        # Inicializa o cliente no modo Enterprise
         self.client = genai.Client(
-            vertexai=True,
+            enterprise=True,
             project="loveyou-21e3d",
-            location="us-central1"
+            location="global"
         )
         
-                # Identificador completo compatível com o Vertex AI na SDK nova
-        self.modelo = 'gemini-1.5-flash'
-
+        # Identificador completo compatível com o Vertex AI na SDK nova
+        self.modelo_visao = 'gemini-3.8-flash'
 
     async def analisar_imagem(self, image_data: bytes, mime_type: str, categoria: str, tamanho_alvo: str, mao_dominante: str, tensao_ponto: str) -> dict:
 
@@ -39,7 +38,7 @@ class AnalisadorTextilIA:
         for tentativa in range(tentativas_maximas):
             try:
                 response = await self.client.aio.models.generate_content(
-                    model=self.modelo,
+                    model=self.modelo_visao,
                     contents=[
                         types.Part.from_bytes(data=image_data, mime_type=mime_type),
                         prompt,
