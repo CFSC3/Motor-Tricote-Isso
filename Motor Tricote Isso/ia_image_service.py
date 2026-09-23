@@ -10,22 +10,22 @@ class GeradorImagensIA:
         caminho_credenciais = os.path.join(os.path.dirname(__file__), 'tricoteIssoVertex.json')
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = caminho_credenciais
 
-        # Cliente para o Gemini (Visão) - Funciona na localização global
+        # Inicializa o cliente no modo Enterprise
         self.client_visao = genai.Client(
             enterprise=True,
+            project="loveyou-21e3d",
+            location="global"
+         )
+        
+        # Cliente para o Gemini Flash Image
+        self.client_gerador = genai.Client(
+            vertexai=True,
             project="loveyou-21e3d", 
             location="global"   
         )
         
-        # Cliente exclusivo para o Imagen - Exige a região us-central1
-        self.client_gerador = genai.Client(
-            enterprise=True,
-            project="loveyou-21e3d", 
-            location="us-central1"   
-        )
-        
         self.modelo_visao = 'gemini-3.8-flash'
-        self.modelo_gerador = 'imagegeneration@006'
+        self.modelo_gerador = 'gemini-2.5-flash-image'
 
     async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:
         categoria_limpa = categoria.strip()
@@ -114,22 +114,31 @@ class GeradorImagensIA:
             """
 
         # ==========================================
-        # PASSO 2: RENDERIZAÇÃO (Usa client_gerador)
+        # PASSO 2: RENDERIZAÇÃO (Usa client_gerador com novo formato)
         # ==========================================
         tentativas_imagem = 6
         for tentativa in range(tentativas_imagem):
             try:
-                resultado_imagem = await self.client_gerador.aio.models.generate_images(
+                # Mudança crucial: generate_content com response_modalities
+                resultado_imagem = await self.client_gerador.aio.models.generate_content(
                     model=self.modelo_gerador,
-                    prompt=prompt_imagem,
-                    config=types.GenerateImagesConfig(
-                        number_of_images=1,
-                        output_mime_type="image/jpeg",
-                        aspect_ratio="16:9" 
+                    contents=prompt_imagem,
+                    config=types.GenerateContentConfig(
+                        response_modalities=["TEXT", "IMAGE"],
+                        candidate_count=1,
                     )
                 )
 
-                imagem_bytes = resultado_imagem.generated_images[0].image.image_bytes
+                imagem_bytes = None
+                # Varre a resposta buscando o bloco que contém os dados da imagem
+                for part in resultado_imagem.candidates[0].content.parts:
+                    if part.inline_data:
+                        imagem_bytes = part.inline_data.data
+                        break
+
+                if not imagem_bytes:
+                    raise ValueError("O modelo gerou a resposta, mas não incluiu os dados da imagem.")
+
                 imagem_base64 = base64.b64encode(imagem_bytes).decode('utf-8')
 
                 return {
