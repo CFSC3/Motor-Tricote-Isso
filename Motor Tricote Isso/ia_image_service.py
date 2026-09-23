@@ -10,7 +10,7 @@ class GeradorImagensIA:
         caminho_credenciais = os.path.join(os.path.dirname(__file__), 'tricoteIssoVertex.json')
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = caminho_credenciais
 
-        # Inicializa o cliente no modo Enterprise
+        # Inicializa o cliente de Visão padronizado com vertexai=True
         self.client_visao = genai.Client(
             enterprise=True,
             project="loveyou-21e3d",
@@ -98,7 +98,11 @@ class GeradorImagensIA:
         if escolhas_adversas:
             prompt_imagem = f"""
             A professional clothing design turnaround reference sheet. 
-            Layout: 3 views side-by-side (Front view, Side view, Back view) on a clean neutral studio background.
+            CRITICAL LAYOUT: EXACTLY 3 distinct views side-by-side in this specific order:
+            1. Straight-on FRONT view.
+            2. True 90-degree SIDE profile view.
+            3. Straight-on BACK view.
+            Do NOT repeat the front view. The middle figure MUST be a side profile.
             Subject: A handcrafted garment/accessory piece: {descricao_extraida}.
             IMPORTANT: Display the item on an INVISIBLE GHOST MANNEQUIN. NO humans, NO animals, NO dolls. ONLY the clothing/accessory.
             Material Physics: {textura_final}
@@ -107,7 +111,11 @@ class GeradorImagensIA:
         else:
             prompt_imagem = f"""
             A professional character design turnaround reference sheet. 
-            Layout: 3 views side-by-side (Front view, Side view, Back view) on a clean neutral studio background.
+            CRITICAL LAYOUT: EXACTLY 3 distinct views side-by-side in this specific order:
+            1. Straight-on FRONT view.
+            2. True 90-degree SIDE profile view.
+            3. Straight-on BACK view.
+            Do NOT repeat the front view. The middle figure MUST be a side profile.
             Subject: A handmade 3D crochet amigurumi doll of this character: {descricao_extraida}.
             Material Physics: {textura_final}
             Style: Cute, highly detailed physical product photography, studio lighting, realistic crochet fibers and yarn fuzz.
