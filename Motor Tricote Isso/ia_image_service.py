@@ -25,7 +25,7 @@ class GeradorImagensIA:
         )
         
         self.modelo_visao = 'gemini-3.8-flash'
-        self.modelo_gerador = 'imagen-3.0-generate-002'
+        self.modelo_gerador = 'imagegeneration@006'
 
     async def gerar_turnaround_amigurumi(self, image_data: bytes, mime_type: str, categoria: str, tex_recomendado: str, tensao_ponto: str, cores_identificadas: str) -> dict:
         categoria_limpa = categoria.strip()
